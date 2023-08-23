@@ -7,8 +7,8 @@ _work in progress_
 This uses Python 3.11, but most previous versions past 3.6 should work fine.
 
 Create venv and activate it:
-`python -m venv venv-311/`
-`.\venv-311\Scripts\activate` (on Windows cmd.exe or PowerShell)
+`python -m venv venv-311/`  
+`.\venv-311\Scripts\activate` (on Windows cmd.exe or PowerShell)  
 `source venv-311/bin/activate` (on Bash)
 
 Install dependencies:
