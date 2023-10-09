@@ -70,11 +70,11 @@ def fetch_sid_64(sid_64: int) -> dict:
         else:
             return row[0], row[1]
 
-@app.route('/login/<int:sid_64>')
-def login(sid_64):
+@app.route('/login')
+def login():
     steamLogin = SteamSignIn()
     # SECURITY: Figure out local https testing, or change to https in prod.
-    steamLogin.RedirectUser(steamLogin.ConstructURL('http://%s:%s/verify/%s' % (os.getenv('KD_HOST'), os.getenv('KD_PORT'), sid_64)))
+    steamLogin.RedirectUser(steamLogin.ConstructURL('http://%s:%s/verify' % (os.getenv('KD_HOST'), os.getenv('KD_PORT'))))
     return "Redirecting to Steam login..."
 
 @app.route('/verify')
