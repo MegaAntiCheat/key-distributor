@@ -1,5 +1,5 @@
 # key-distributor
-Stateless web app written in Flask to distribute account-tied private keys to MegaAntiCheat clients using Steam OAuth.  
+Stateless web app written in Flask to distribute account-tied private keys to MegaAntiCheat clients using Steam OpenID.  
 _work in progress_
 
 # Getting Started
