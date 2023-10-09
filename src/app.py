@@ -53,11 +53,11 @@ def main():
         printerr("Failed to connect to database: " + str(e))
         exit(1)
     if os.getenv('FLASK_ENV') == 'development':
-        app.run(host="127.0.0.1", port=4434, debug=True, load_dotenv=True)
+        app.run(host="127.0.0.1", port=os.getenv("KD_PORT"), debug=True, load_dotenv=True)
     else:
         # Use gunicorn (same port)
         from subprocess import call
-        call(["gunicorn", "app:app", "-b", "0.0.0.0:4434"])
+        call(["gunicorn", "app:app", "-b", "0.0.0.0:%s" % os.getenv("KD_PORT")])
         # TODO: Implement a proxy Apache/nginx server to forward requests from 443/tcp
 
 # Returns: {"pub_key_fingerprint": bytes(64), "created": datetime}
