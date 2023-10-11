@@ -21,23 +21,6 @@ app = Flask(__name__)
 
 conn = None
 
-# The following environment variables are used:
-'''
-FLASK_ENV
-KD_HOST : Hostname of webapp, suggest it to be getakey.megascatterbomb.com
-KD_PORT
-KD_DEBUG
-STEAM_CID : Steam client ID of administrator (NOT the same as a SteamID64)
-STEAM_WEB_API_KEY : Used for Steam OAuth access
-STEAM_API_DOMAIN : Used for Steam OAuth access
-Database stuff:
-PG_HOST
-PG_PORT
-PG_USER
-PG_PASS
-PG_DB : Database name (tenatively, "mac-kd")
-'''
-
 def main():
     # Check that all environment variables are set
     env_vars = ['FLASK_ENV', 'KD_PORT', 'KD_DEBUG', 'STEAM_CID', 'STEAM_WEB_API_KEY', 'STEAM_API_DOMAIN', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
@@ -109,7 +92,6 @@ def verifier():
             return encode_key(signing_key)
         # Rate limit: 1 hour
         elif datetime.now()-created < timedelta(hours=1):
-            #return "Error: Rate limit exceeded. Wait 1 hour before creating a new key.", 429
             response = app.response_class(
                 response="Error: Rate limit exceeded. Wait 1 hour before creating a new key.",
                 status=429,
