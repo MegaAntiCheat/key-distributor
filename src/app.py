@@ -76,7 +76,6 @@ def login():
     steamLogin = SteamSignIn()
     # SECURITY: Figure out local https testing, or change to https in prod.
     steamLogin.RedirectUser(steamLogin.ConstructURL('http://%s:%s/verify' % (os.getenv('KD_HOST'), os.getenv('KD_PORT'))))
-    # Set MIME type
     response = app.response_class(
         response="Redirecting to Steam Login...",
         status=302,
