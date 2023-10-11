@@ -1,10 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify, redirect, jsonify
 from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import Base64Encoder, HexEncoder
 from nacl.hash import sha512
 from datetime import datetime
 from pysteamsignin import SteamSignIn
+from steamid import SteamID
 import psycopg
 import os
 printerr = lambda x: print(x, file=sys.stderr)
@@ -75,16 +76,27 @@ def login():
     steamLogin = SteamSignIn()
     # SECURITY: Figure out local https testing, or change to https in prod.
     steamLogin.RedirectUser(steamLogin.ConstructURL('http://%s:%s/verify' % (os.getenv('KD_HOST'), os.getenv('KD_PORT'))))
-    return "Redirecting to Steam login..."
+    # Set MIME type
+    response = app.response_class(
+        response="Redirecting to Steam Login...",
+        status=302,
+        mimetype='text/plain'
+    )
+    return response
 
 @app.route('/verify')
 def verifier():
     steamLogin = SteamSignIn()
     # Get args from GET
-    response = request.args
-    sid_64 = steamLogin.ValidateResults(response)
+    steam_response = request.args
+    sid_64 = steamLogin.ValidateResults(steam_response)
+    response = None
     if sid_64 == None:
-        return "Error: Invalid response from Steam Login.", 401
+        response = app.response_class(
+            response="Error: Invalid response from Steam Login.",
+            status=401,
+            mimetype='text/plain'
+        )
     else:
         fingerprint, created = fetch_sid_64(sid_64)
         if created == None:
@@ -98,7 +110,12 @@ def verifier():
             return encode_key(signing_key)
         # Rate limit: 1 hour
         elif datetime.now()-created < timedelta(hours=1):
-            return "Error: Rate limit exceeded. Wait 1 hour before creating a new key.", 429
+            #return "Error: Rate limit exceeded. Wait 1 hour before creating a new key.", 429
+            response = app.response_class(
+                response="Error: Rate limit exceeded. Wait 1 hour before creating a new key.",
+                status=429,
+                mimetype='text/plain'
+            )
         else:
             # Generate new keys
             signing_key = SigningKey.generate()
@@ -107,7 +124,61 @@ def verifier():
             with conn.cursor() as cur:
                 cur.execute("UPDATE pki SET pub_key_fingerprint = %s, created = %s WHERE sid_64 = %s", (fingerprint(verify_key), datetime.now(), u2s(sid_64)))
             # Return signing key to client
-            return encode_key(signing_key)
+            response = app.response_class(
+                response=encode_key(signing_key),
+                status=200,
+                mimetype='text/plain'
+            )
+    return response
+
+# Takes lower-case hex string
+# Returns json
+@app.route('/whoami/<pub_key_fingerprint>')
+def whoami(pub_key_fingerprint):
+    hash = None
+    # Validate that pub_key_fingerprint is a possible SHA-512 hash
+    try:
+        hash = bytes.fromhex(pub_key_fingerprint)
+        if len(hash) != 64:
+            raise ValueError
+    except ValueError:
+        # Response should have json with one key, "error"
+        response = app.response_class(
+            response=json.dumps({"error": "Invalid fingerprint."}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    sid_64 = None
+    # Check if public key fingerprint exists in database, store sid_64 if it does
+    with conn.cursor() as cur:
+        cur.execute("SELECT sid_64 FROM pki WHERE pub_key_fingerprint = %s", (hash,))
+        row = cur.fetchone()
+        if row == None:
+            # Response should have json with one key, "error"
+            # Use jsonify
+            response = make_response(
+                jsonify({"error": "Fingerprint not found."}),
+                404,
+            )
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        else:
+            sid_64 = s2u(row[0])
+    sid = SteamID(str(sid_64))
+    payload = {
+        "error": None,
+        "steam3ID": sid.steam3(),
+        "steamID64": sid.getSteamID64(),
+        "steamID32": sid.steam2(),
+        "url": "https://steamcommunity.com/profiles/%s" % sid.getSteamID64()
+    }
+    response = make_response(
+        jsonify(payload),
+        200,
+    )
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 if __name__ == '__main__':
     main()
