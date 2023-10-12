@@ -1,14 +1,15 @@
-from flask import Flask, request, jsonify, redirect, jsonify
+from flask import Flask, request, jsonify, redirect, jsonify, make_response
 from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import Base64Encoder, HexEncoder
 from nacl.hash import sha512
-from datetime import datetime
+from datetime import datetime, timedelta
 from pysteamsignin import SteamSignIn
 from steamid import SteamID
 import psycopg
 import os
-printerr = lambda x: print(x, file=sys.stderr)
+from sys import stderr
+printerr = lambda x: print(x, file=stderr)
 # sid_64 unsigned to signed and vice versa
 u2s = lambda uint: uint - 2**63
 s2u = lambda sint: sint + 2**63
@@ -124,10 +125,9 @@ def whoami(pub_key_fingerprint):
             raise ValueError
     except ValueError:
         # Response should have json with one key, "error"
-        response = app.response_class(
-            response=json.dumps({"error": "Invalid fingerprint."}),
-            status=400,
-            mimetype='application/json'
+        response = make_response(
+            jsonify({"error": "Invalid public key fingerprint."}),
+            400,
         )
         return response
     sid_64 = None
