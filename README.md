@@ -19,16 +19,17 @@ Set environment variables (in .env in project root), set by default in prod work
 `FLASK_ENV` : `production` or `development`
 `KD_PORT`  
 `KD_DEBUG`  
-`STEAM_CID` : Steam client ID of administrator (NOT the same as a SteamID64)  
-`STEAM_WEB_API_KEY` : Used for Steam OAuth access  
-`STEAM_API_DOMAIN` : Used for Steam OAuth access  
 
-Database stuff:  
+& database stuff (use your own PostgreSQL server):  
 `PG_HOST`  
 `PG_PORT`  
 `PG_USER`  
 `PG_PASS`  
-`PG_DB` : Database name (tenatively, `"mac-kd"`)
+`PG_DB` : Database name (tenatively, `"mac-kd"`)  
+
+Make a table according to `db/schema.sql` before running.  
 
 Run the app:  
-`flask run`
+`python src/app.py`  
+
+Access it from `http://KD_HOST:KD_PORT/login`
