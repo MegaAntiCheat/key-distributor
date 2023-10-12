@@ -16,7 +16,7 @@ Install dependencies:
 
 Set environment variables (in .env in project root), set by default in prod workflow:  
 
-`FLASK_ENV` : `production` or `development`
+`FLASK_ENV` : `production` or `development`  
 `KD_PORT`  
 `KD_DEBUG`  
 
