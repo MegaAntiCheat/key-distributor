@@ -25,7 +25,7 @@ Set environment variables (in .env in project root), set by default in prod work
 `PG_PORT`  
 `PG_USER`  
 `PG_PASS`  
-`PG_DB` : Database name (tenatively, `"mac-kd"`)  
+`PG_DB` : Database name (tentatively, `"mac-kd"`)  
 
 Make a table according to `db/schema.sql` before running.  
 
