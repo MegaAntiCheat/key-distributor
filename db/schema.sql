@@ -3,4 +3,4 @@ CREATE TABLE pki(
     "pub_key_fingerprint" BYTEA,
     "created" TIMESTAMP,
     PRIMARY KEY ("sid_64")
-)
+);
