@@ -1,4 +1,5 @@
 # key-distributor
+
 Stateless web app written in Flask to distribute account-tied private keys to MegaAntiCheat clients using Steam OpenID.  
 _work in progress_
 
@@ -14,22 +15,23 @@ Create venv and activate it:
 Install dependencies:  
 `python -m pip install -r requirements.txt`
 
-Set environment variables (in .env in project root), set by default in prod workflow:  
+Set environment variables (in .env in project root), set by default in prod workflow:
 
 `FLASK_ENV` : `production` or `development`  
+`KD_HOST`
 `KD_PORT`  
-`KD_DEBUG`  
+`KD_DEBUG`
 
 & database stuff (use your own PostgreSQL server):  
 `PG_HOST`  
 `PG_PORT`  
 `PG_USER`  
 `PG_PASS`  
-`PG_DB` : Database name (tentatively, `"mac-kd"`)  
+`PG_DB` : Database name (tentatively, `"mac-kd"`)
 
-Make a table according to `db/schema.sql` before running.  
+Make a table according to `db/schema.sql` before running.
 
 Run the app:  
-`python src/app.py`  
+`python src/app.py`
 
 Access it from `http://KD_HOST:KD_PORT/login`
