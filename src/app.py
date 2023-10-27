@@ -40,8 +40,6 @@ def main():
         exit(1)
     if os.getenv('KD_DEBUG') in ('True', 'true', '1', 't', 'y', 'yes', 'Y', 'Yes', 'YES'):
         dbg = True
-    else:
-        dbg = False
     # Connect to database
     try:
         global conn
