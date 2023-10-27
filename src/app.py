@@ -9,7 +9,7 @@ from steamid import SteamID
 import psycopg
 import os
 from sys import stderr
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 printerr = lambda x: print(x, file=stderr)
 # sid_64 unsigned to signed and vice versa
 u2s = lambda uint: uint - 2**63
@@ -26,10 +26,9 @@ app = Flask(__name__)
 def main():
     # Check if .env exists in root directory
     if os.path.exists('.env'):
-        load_dotenv()
+        load_dotenv(find_dotenv(), override=True)
     else:
         printerr("WARNING: No .env file found in root directory.")
-
     # Check that all environment variables are set
     env_vars = ['FLASK_ENV', 'KD_HOST', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
     # Filter out unset environment variables
