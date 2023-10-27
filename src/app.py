@@ -34,6 +34,7 @@ def main():
     env_vars = ['FLASK_ENV', 'KD_HOST', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
     # Filter out unset environment variables
     unset_vars = list(filter(lambda x: os.getenv(x) == None, env_vars))
+    dbg = False
     if len(unset_vars) > 0:
         printerr("The following environment variables are unset: " + str(unset_vars))
         printerr("Please set them and try again.")
