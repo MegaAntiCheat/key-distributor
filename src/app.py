@@ -19,7 +19,7 @@ encode_key = lambda signing_key: signing_key.encode(Base64Encoder).decode('utf-8
 # To store in DB
 fingerprint = lambda verify_key: sha512(verify_key.encode(), encoder=RawEncoder)
 # To query from whoami
-fp_human_readable = lambda fingerprint: fingerprint.encode(HexEncoder).decode('utf-8')
+fp_human_readable = lambda fp: fp.encode(HexEncoder).decode('utf-8')
 
 app = Flask(__name__)
 
