@@ -31,13 +31,17 @@ def main():
         printerr("WARNING: No .env file found in root directory.")
 
     # Check that all environment variables are set
-    env_vars = ['FLASK_ENV', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
+    env_vars = ['FLASK_ENV', 'KD_HOST', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
     # Filter out unset environment variables
     unset_vars = list(filter(lambda x: os.getenv(x) == None, env_vars))
     if len(unset_vars) > 0:
         printerr("The following environment variables are unset: " + str(unset_vars))
         printerr("Please set them and try again.")
         exit(1)
+    if os.getenv('KD_DEBUG') in ('True', 'true', '1', 't', 'y', 'yes', 'Y', 'Yes', 'YES'):
+        dbg = True
+    else:
+        dbg = False
     # Connect to database
     try:
         global conn
@@ -46,7 +50,7 @@ def main():
         printerr("Failed to connect to database: " + str(e))
         exit(1)
     if os.getenv('FLASK_ENV') == 'development':
-        app.run(host="127.0.0.1", port=os.getenv("KD_PORT"), debug=True, load_dotenv=True)
+        app.run(host="127.0.0.1", port=os.getenv("KD_PORT"), debug=dbg, load_dotenv=True)
     else:
         # Use gunicorn (same port)
         from subprocess import call
