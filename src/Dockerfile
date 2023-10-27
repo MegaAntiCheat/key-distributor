@@ -1,18 +1,15 @@
-# Base image
-FROM python:3.11-alpine3.18
+# FILEPATH: /c:/Users/linmi/Documents/key-distributor/src/Dockerfile
 
-# Listen on 4434/tcp (HTTP)
-EXPOSE 4434/tcp
-### We need a web server to terminate TLS/SSL on 443
-### and forward it to the app
+FROM python:3.12-alpine
 
-# Install dependencies
-COPY requirements.txt /dev/shm/requirements.txt
-RUN pip install -r /dev/shm/requirements.txt
+ENV KD_PORT=4434
 
-# Copy the app
-COPY src /app
 WORKDIR /app
 
-# Run the app
+COPY requirements.txt .
+COPY src/app.py .
+
+RUN apk add build-base libffi-dev
+RUN pip install -r requirements.txt
+
 CMD ["python", "app.py"]

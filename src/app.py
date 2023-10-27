@@ -30,7 +30,7 @@ def main():
     else:
         printerr("WARNING: No .env file found in root directory.")
     # Check that all environment variables are set
-    env_vars = ['FLASK_ENV', 'KD_HOST', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
+    env_vars = ['FLASK_ENV', 'KD_IP', 'KD_HOST', 'KD_PORT', 'KD_DEBUG', 'PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASS', 'PG_DB']
     # Filter out unset environment variables
     unset_vars = list(filter(lambda x: os.getenv(x) == None, env_vars))
     dbg = False
@@ -50,11 +50,11 @@ def main():
         printerr("Failed to connect to database: " + str(e))
         exit(1)
     if os.getenv('FLASK_ENV') == 'development':
-        app.run(host="127.0.0.1", port=os.getenv("KD_PORT"), debug=dbg, load_dotenv=True)
+        app.run(host=os.getenv("KD_IP"), port=os.getenv("KD_PORT"), debug=dbg, load_dotenv=True)
     else:
         # Use gunicorn (same port)
         from subprocess import call
-        call(["gunicorn", "app:app", "-b", "0.0.0.0:%s" % os.getenv("KD_PORT")])
+        call(["gunicorn", "app:app", "-b", "%s:%s" % (os.getenv("KD_IP"), os.getenv("KD_PORT"))])
         # TODO: Implement a proxy Apache/nginx server to forward requests from 443/tcp
 
 # Returns: {"pub_key_fingerprint": bytes(64), "created": datetime}
@@ -75,12 +75,11 @@ def login():
 
 @app.route('/verify')
 def verifier():
-    crudded = False
     steamLogin = SteamSignIn()
     # Get args from GET
     steam_response = request.args
     sid_64 = steamLogin.ValidateResults(steam_response)
-    printerr("Got sid_64: " + str(sid_64))
+    #printerr("Got sid_64: " + str(sid_64))
     response = None
     if sid_64 == False:
         response = app.response_class(
@@ -91,7 +90,7 @@ def verifier():
     else:
         _, created = fetch_sid_64(sid_64)
         if created == None:
-            printerr("New user, generating keys.")
+            #printerr("New user, generating keys.")
             # New user, generate keys
             signing_key = SigningKey.generate()
             verify_key = signing_key.verify_key
@@ -103,7 +102,7 @@ def verifier():
             return encode_key(signing_key)
         # Rate limit: 1 hour
         elif datetime.now()-created < timedelta(hours=1):
-            printerr("Rate Limit Exceeded.")
+            #printerr("Rate Limit Exceeded.")
             response = app.response_class(
                 response="Error: Rate limit exceeded. Wait 1 hour before creating a new key.",
                 status=429,
@@ -111,7 +110,7 @@ def verifier():
             )
         else:
             # Generate new keys
-            printerr("Updating keys.")
+            #printerr("Updating keys.")
             signing_key = SigningKey.generate()
             verify_key = signing_key.verify_key
             # Update database

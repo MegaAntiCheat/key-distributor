@@ -3,7 +3,7 @@
 Stateless web app written in Flask to distribute account-tied private keys to MegaAntiCheat clients using Steam OpenID.  
 _work in progress_
 
-# Getting Started
+## Getting Started
 
 This uses Python 3.11, but most previous versions past 3.6 should work fine.
 
@@ -18,7 +18,8 @@ Install dependencies:
 Set environment variables (in .env in project root), set by default in prod workflow:
 
 `FLASK_ENV` : `production` or `development`  
-`KD_HOST`
+`KD_HOST` : Domain name used in production. If in development, make it some accessible IP.
+`KD_IP` : The private IP Flask will try to listen on.
 `KD_PORT`  
 `KD_DEBUG`
 
@@ -35,3 +36,6 @@ Run the app:
 `python src/app.py`
 
 Access it from `http://KD_HOST:KD_PORT/login`
+
+## Using Docker
+
